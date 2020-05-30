@@ -1,0 +1,56 @@
+# Makefile for nmake (Visual Studio Community 2019)
+
+CC=cl
+CPPFLAGS=/std:c++17 /w /EHsc /MD
+CPPFLAGSPLUS=$(CPPFLAGS) /O2
+
+# Directories where to look for header files
+CIMGHDR=include/CImg/CImg.h
+FDEEPHDR=include/fdeep/fdeep.hpp
+JPEGHDR=include/jpeg-9d/jpeglib.h include/jpeg-9d/jconfig.vc
+PNGHDR=include/libpng-1.6.37/png.h
+ZLIBHDR=include/zlib-1.2.11/zlib.h
+INCS= /Iinclude /Iinclude/eigen3 /Iinclude/CImg /Iinclude/libpng-1.6.37 /Iinclude/jpeg-9d /Iinclude/zlib-1.2.11
+
+# Needed libraries
+PNGLIB=lib/libpng.lib
+JPEGLIB=lib/libjpeg.lib
+ZLIB=lib/zlib.lib
+LIBS=$(PNGLIB) $(JPEGLIB) $(ZLIB) kernel32.lib user32.lib gdi32.lib Shell32.lib
+
+LINK=link
+LDFLAGS=/NODEFAULTLIB:libcmt
+
+# Template command for compiling .cpp to .obj
+.cpp.obj:
+	$(CC) $(CPPFLAGSPLUS) $(INCS) /c $*.cpp
+
+all: predict.exe tpredict.exe inputtensor.exe
+
+predict.exe: predict.obj $(PNGLIB) $(JPEGLIB) $(ZLIB)
+	$(LINK) $(LDFLAGS) predict.obj $(LIBS)
+
+predict.obj: predict.cpp  cfgfile.hpp jconfig.h $(CIMGHDR) $(FDEEPHDR) $(JPEGHDR) $(PNGHDR) $(ZLIBHDR)
+	$(CC) $(CPPFLAGSPLUS) $(INCS) /c predict.cpp
+
+tpredict.exe: tpredict.obj $(FDEEPHDR)
+	$(LINK) $(LDFLAGS) tpredict.obj kernel32.lib user32.lib gdi32.lib Shell32.lib
+
+tpredict.obj: tpredict.cpp  cfgfile.hpp jconfig.h $(CIMGHDR) $(FDEEPHDR) $(JPEGHDR) $(PNGHDR) $(ZLIBHDR)
+	$(CC) $(CPPFLAGSPLUS) $(INCS) /c tpredict.cpp
+
+inputtensor.exe: inputtensor.obj $(JPEGLIB) $(ZLIB) $(PNGLIB)
+	$(LINK) $(LDFLAGS) inputtensor.obj $(LIBS)
+
+inputtensor.obj: inputtensor.cpp jconfig.h $(JPEGLIB) $(ZLIB) $(PNGLIB)
+	$(CC) $(CPPFLAGSPLUS) $(INCS) /c inputtensor.cpp
+
+jconfig.h: include/jpeg-9d/jconfig.vc
+	copy include\jpeg-9d\jconfig.vc include\jconfig.h
+
+install: predict.exe tpredict.exe inputtensor.exe
+	move *.exe exe_windows
+
+clean:
+	del *.obj
+	del include\jconfig.h

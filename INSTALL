@@ -1,0 +1,47 @@
+
+Installation of prediction tools
+
+0) Before you can build these tools you need to install the following packages:
+   i)	Zlib library (libz.a on Cygwin or zlib.lib on Windows) and header file (zlib.h) from http://zlib.net
+		or from http://libpng.download/src
+   ii)	Jpeg library (libjpeg.a or libjpeg.lib) and header files (jpeglib.h) from http://www.ijg.org/files
+   iii)	Png library (libpng16.a or libpng.lib) and header files (png.h  pngconf.h  pnglibconf.h) from
+		http://libpng.download/src.
+   iv)	CImg package only header file (CImg.h) from http://cimg.eu
+   v)	Header files of fdeep, eigen, fplus and nlohmann packages from
+		https://github.com/Dobiasd/frugally-deep and following the installtion instructions given there.
+
+	The Makefiles expect these packages in local directories according to the following directory tree. 
+	If you choose a different place you need to adopt the Makefiles accordingly.
+	
+		FD-predict
+		  include
+			zlib-1.2.11 (needed by png package)
+			jpeg-9d
+			libpng-1.6.37
+			CIimg
+			eigen3
+			fdeep
+			fplus
+			lohmann
+		  lib
+		    libjpeg.a  libjpeg.lib  libpng.lib  libpng16.a  libz.a  zlib.lib
+	
+	For your convenience I have added the needed header files in include and the required libraries in lib. 
+
+1) On Cygwin you need g++, make and the X11 and pthread libraries.
+
+Copy Makefile.cygwin into this directory
+
+    cp Makefiles/Makefile.cygwin Makefile
+    make
+
+2) On Windows 10 using the freely available Visual Studio Community
+
+Start the GUI of Visual Studio Community and start a Developer Command Prompt (Tools -> Command Line). In this
+Command Prompt window all needed paths are set. We need nmake, cl, lib and link.
+
+Copy Makefile.msw into this directory
+
+    copy Makefiles/Makefile.msw Makefile
+    nmake

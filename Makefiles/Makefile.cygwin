@@ -1,0 +1,55 @@
+# Makefile for Cygwin64
+
+# Which compiler should be used
+CXX = g++
+CC = $(CXX)
+
+# What flags should be passed to the compiler
+#DEBUG_LEVEL     = -g
+EXTRA_CCFLAGS   = -Wall -std=gnu++14 -O2
+CXXFLAGS        = $(EXTRA_CCFLAGS)
+CCFLAGS         = $(CXXFLAGS)
+
+# What flags should be passed to the C pre-processor
+CIMG_HDR=include/CImg/CImg.h
+FDEEP_HDR=include/fdeep/fdeep.hpp
+JPEGHDR=include/jpeg-9d/jpeglib.h
+PNGHDR=include/libpng-1.6.37/png.h
+
+# include directories
+INCS = -Iinclude/CImg -Iinclude -Iinclude/jpeg-9d -Iinclude/zlib-1.2.11 -Iinclude/libpng-1.6.37
+
+CPPFLAGS = $(INCS)
+
+PNGLIB=lib/libpng16.a
+JPEGLIB=lib/libjpeg.a
+ZLIB=lib/libz.a
+
+# What flags should be passed to the linker
+LIBRARIES=$(PNGLIB) $(JPEGLIB) $(ZLIB)				  
+
+all: predict tpredict inputtensor
+
+predict.o: predict.cpp $(CIMG_HDR) $(FDEEP_HDR) $(JPEGHDR) $(PNGHDR)
+	$(CC) $(CPPFLAGS) $(CCFLAGS) -c predict.cpp -o predict.o
+
+predict: predict.o $(JPEGLIB)
+	$(CC)  -o predict  predict.o $(LIBRARIES) -lX11 -lpthread
+
+tpredict.o: tpredict.cpp $(FDEEP_HDR)
+	$(CC) $(CPPFLAGS) $(CCFLAGS) -c tpredict.cpp -o tpredict.o
+
+tpredict: tpredict.o
+	$(CC) -o tpredict  tpredict.o
+
+inputtensor.o: inputtensor.cpp $(CIMG_HDR) $(FDEEP_HDR) $(JPEGHDR)  $(PNGHDR)
+	$(CC) $(CPPFLAGS) $(CCFLAGS) -c inputtensor.cpp -o inputtensor.o
+
+inputtensor: inputtensor.o $(LIBRARIES)
+	$(CC) -o inputtensor inputtensor.o $(LIBRARIES) -lX11 -lpthread
+
+clean:
+	rm -f *.o *.exe
+
+install: predict.exe inputtensor.exe tpredict.exe
+	mv *.exe cygwin64_bin
