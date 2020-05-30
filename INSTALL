@@ -45,3 +45,18 @@ Copy Makefile.msw into this directory
 
     copy Makefiles/Makefile.msw Makefile
     nmake
+
+3) Large model files.
+
+Github does not allow files bigger than 50M so I have to split the Json models in two gzipped pieces. To rebuild the
+Json model from these pieces you have to (on Cygwin)
+	cd leafrollers
+	gunzip LEAFROLLERSaa.gz LEAFROLLERSab.gz
+	cat LEAFROLLERSaa LEAFROLLERSab > leafrollers.json
+	rm LEAFROLLERS??
+	
+	cd catsdogs
+	gunzip JB_FINALMODELaa.gz JB_FINALMODELab.gz
+	cat JB_FINALMODELaa JB_FINALMODELSab > JB_finalmodel.json
+	rm JB_FINALMODEL??
+	
